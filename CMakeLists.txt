@@ -52,8 +52,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-#
-# To enable code auto-completion, please specify path
-# to main source file (*.c, *.cpp) and uncomment line below
-#
-# add_executable(foosballino src/main_change_me.cpp)
+ add_executable(foosballino src/foosballino.cpp)
