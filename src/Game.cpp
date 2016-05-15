@@ -4,7 +4,7 @@
 
 #include "Game.h"
 
-Game::Game(uint32_t pins[4], uint32_t reset_game_pin, uint32_t settings_pin) {
+Game::Game(uint32_t goal_pins[2], uint32_t pins[4], uint32_t reset_game_pin, uint32_t settings_pin) {
     this->scores[TEAM_A] = 0;
     this->scores[TEAM_B] = 0;
 
@@ -12,6 +12,9 @@ Game::Game(uint32_t pins[4], uint32_t reset_game_pin, uint32_t settings_pin) {
     this->max_scores[TEAM_A] = DEFAULT_MAX_SCORE;
 
     this->in_game = true;
+
+    goals[TEAM_A].set_pin(goal_pins[0]);
+    goals[TEAM_B].set_pin(goal_pins[1]);
 
     buttons[TEAM_A][MINUS].set_pin(pins[0]);
     buttons[TEAM_A][PLUS].set_pin(pins[1]);

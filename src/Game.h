@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include "Button.h"
+#include "GoalDetector.h"
 
 #define SCORE_LIMIT = 99
 #define TEAM_A 0
@@ -20,12 +21,13 @@
 class Game {
 
 public:
-    Game(uint32_t[4], uint32_t, uint32_t);
+    Game(uint32_t[2], uint32_t[4], uint32_t, uint32_t);
     void update();
 
 private:
     int max_scores[2];
     int scores[2];
+    GoalDetector goals[2];
     Button* buttons[4];
     Button* reset_button;
     Button* settings_button;
