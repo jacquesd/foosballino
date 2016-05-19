@@ -52,23 +52,8 @@ void Game::update() {
 }
 
 void Game::game_update() {
-    if (buttons[TEAM_A][MINUS].is_pressed() && scores[TEAM_A] > 0) {
-        scores[TEAM_A]--;
-    }
-
-    if (buttons[TEAM_A][PLUS].is_pressed() && scores[TEAM_A] < max_scores[TEAM_A]) {
-        scores[TEAM_A]++;
-    }
-
-    if (buttons[TEAM_B][MINUS].is_pressed() && scores[TEAM_B] > 0) {
-        scores[TEAM_B]--;
-    }
-
-    if (buttons[TEAM_B][PLUS].is_pressed() && scores[TEAM_B] < max_scores[TEAM_B]) {
-        scores[TEAM_B]++;
-    }
-
-    // Insert Goal detectors code here
+    update_score(TEAM_A);
+    update_score(TEAM_B);
 
     if (scores[TEAM_A] >= max_scores[TEAM_A]) {
         // victory
@@ -98,4 +83,18 @@ void Game::settings_update() {
 void Game::reset_scores() {
     scores[TEAM_A]= 0;
     scores[TEAM_B] = 0;
+}
+
+void Game::update_socre(byte team) {
+    if (score[team] >= max_scores[team]) {
+        return;
+    }
+
+    if (scores[team] > 0 && buttons[team][MINUS].is_pressed()) {
+        scores[team]--;
+    }
+
+    if (goals[team].isGoal() || buttons[team][PLUS].is_pressed()) {
+        scores[team]++;
+    }
 }

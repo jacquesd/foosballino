@@ -37,6 +37,7 @@ private:
     void settings_update();
     void game_update();
     void reset_scores();
+    void update_score(byte);
 };
 
 
