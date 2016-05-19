@@ -16,7 +16,15 @@
 #define MINUS 0
 #define PLUS 1
 #define DEFAULT_MAX_SCORE 10
+#define END_TIMEOUT 5000 // ms
 
+
+enum State {
+    start_state,
+    game_state,
+    settings_state,
+    end_state
+};
 
 class Game {
 
@@ -25,17 +33,20 @@ public:
     void update();
 
 private:
+    State state;
     int max_scores[2];
     int scores[2];
     GoalDetector goals[2];
     Button* buttons[4];
     Button* reset_button;
     Button* settings_button;
-    bool in_game;
-    bool settings_mode;
+    uint32_t end_time;
 
-    void settings_update();
+    void start_update();
     void game_update();
+    void settings_update();
+    void end_update();
+
     void reset_scores();
     void update_score(byte);
 };
