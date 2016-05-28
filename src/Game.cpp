@@ -4,7 +4,7 @@
 
 #include "Game.h"
 
-Game::Game(uint32_t goal_pins[2], uint32_t pins[4], uint32_t reset_game_pin, uint32_t settings_pin) {
+Game::Game(uint32_t goal_pins[2], uint32_t pins[4], uint32_t reset_game_pin, uint32_t settings_pin, uint32_t led_pin) {
     state = start_state;
 
     scores[TEAM_A] = 0;
@@ -24,6 +24,9 @@ Game::Game(uint32_t goal_pins[2], uint32_t pins[4], uint32_t reset_game_pin, uin
 
     reset_button    = new Button(reset_game_pin);
     settings_button = new Button(settings_pin);
+
+    led_strip = LEDStrip(LED_COUNT, led_pin);
+    led_strip.fade(0xff0000, 0x0000ff, 255, 40);
 }
 
 void Game::update() {
@@ -49,6 +52,7 @@ void Game::start_update() {
     } else if (reset_button->is_pressed()) {
         reset_scores();
         state = game_state;
+        led_strip.set_default();
     }
 }
 
