@@ -31,7 +31,7 @@ enum State {
 class Game {
 
 public:
-    Game(uint32_t[2], uint32_t[4], uint32_t, uint32_t, uint32_t);
+    Game(uint32_t[2], uint32_t[4], uint32_t, uint32_t, uint32_t, uint32_t);
     void update();
 
 private:
@@ -42,8 +42,12 @@ private:
     Button* buttons[4];
     Button* reset_button;
     Button* settings_button;
+    Button* mode_button;
     LEDStrip* led_strip;
+    uint32_t start_time;
     uint32_t end_time;
+    bool timed_game;
+    uint32_t duration;
 
     void start_update();
     void game_update();
