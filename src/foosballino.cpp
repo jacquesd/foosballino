@@ -11,8 +11,6 @@ uint32_t led_pin = 6;
 Game* game;
 
 void setup() {
-    //TODO set pins mode
-
     game = new Game(goal_pins, button_pins, reset_game_pin, settings_pin, mode_pin, led_pin);
 }
 

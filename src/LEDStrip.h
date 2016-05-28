@@ -5,6 +5,7 @@
 #ifndef FOOSBALLINO_LEDSTRIP_H
 #define FOOSBALLINO_LEDSTRIP_H
 
+#include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 
 enum  Pattern {

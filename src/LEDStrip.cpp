@@ -25,6 +25,7 @@ LEDStrip::LEDStrip(uint32_t led_count, uint32_t data_pin) {
     //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip), correct for neopixel stick
 
     this->led_count = led_count;
+    pinMode(data_pin, INPUT_PULLUP);
 
     strip = new Adafruit_NeoPixel(this->led_count, data_pin, NEO_GRB + NEO_KHZ800);
 

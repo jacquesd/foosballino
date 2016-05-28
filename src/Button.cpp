@@ -18,4 +18,5 @@ bool Button::is_pressed() {
 
 void Button::set_pin(uint32_t pin) {
     this->pin = pin;
+    pinMode(this->pin, INPUT);
 }

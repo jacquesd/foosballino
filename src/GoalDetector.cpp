@@ -10,6 +10,7 @@ GoalDetector::GoalDetector() {
 
 void GoalDetector::set_pin(uint32_t pin) {
     this->pin = pin;
+    pinMode(this->pin, INPUT);
     init();
 }
 
