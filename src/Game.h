@@ -10,6 +10,7 @@
 #include "Button.h"
 #include "config.h"
 #include "LEDStrip.h"
+#include "Display.h"
 #include "GoalDetector.h"
 #include "time.h"
 
@@ -46,6 +47,7 @@ private:
     Button* settings_button;
     Button* mode_button;
     LEDStrip* led_strip;
+    Display* display;
     uint32_t start_time;
     uint32_t end_time;
     bool timed_game;

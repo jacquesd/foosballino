@@ -31,6 +31,9 @@ Game::Game() {
 
     led_strip = new LEDStrip(LED_COUNT, LED_PIN);
     led_strip->fade(0xff0000, 0x0000ff, 255, 40);
+
+    display = new Display();
+    display->welcome();
 }
 
 void Game::update() {
@@ -66,6 +69,7 @@ void Game::settings_update() {
     timed_game = mode_button->is_pressed();
 
     if (timed_game) {
+        display->duration_settings(duration);
         if (buttons[TEAM_A][MINUS].is_pressed()) {
             duration = (minutes(duration) <= 0)
                        ? (59 * MSECS_PER_MIN  + seconds(duration))
@@ -90,6 +94,7 @@ void Game::settings_update() {
                        : (duration + MSECS_PER_SEC);
         }
     } else {
+        display->score_settings(max_scores);
         if (buttons[TEAM_A][MINUS].is_pressed()) {
             max_scores[TEAM_A] = (max_scores[TEAM_A] - 1 <= 1) ? 99 : (max_scores[TEAM_A] - 1);
         }
@@ -116,6 +121,7 @@ void Game::settings_update() {
 void Game::game_update() {
     update_score(TEAM_A);
     update_score(TEAM_B);
+    display->scores(scores, duration);
 
     if (timed_game && millis() - start_time > duration) {
         state = end_state;
@@ -139,6 +145,13 @@ void Game::game_update() {
 }
 
 void Game::end_update() {
+    if (scores[TEAM_A] > scores[TEAM_B]) {
+        display->victory(TEAM_A);
+    }  else if (scores[TEAM_A] < scores[TEAM_B]) {
+        display->victory(TEAM_B);
+    } else {
+        display->draw();
+    }
     if (buttons[TEAM_A][MINUS].is_pressed()) {
         scores[TEAM_A]--;
         state = game_state;
