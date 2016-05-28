@@ -9,6 +9,7 @@
 
 #include "Button.h"
 #include "GoalDetector.h"
+#include "LEDStrip.h"
 
 #define SCORE_LIMIT = 99
 #define TEAM_A 0
@@ -17,6 +18,7 @@
 #define PLUS 1
 #define DEFAULT_MAX_SCORE 10
 #define END_TIMEOUT 5000 // ms
+#define LED_COUNT 70 //leds per strip
 
 
 enum State {
@@ -29,7 +31,7 @@ enum State {
 class Game {
 
 public:
-    Game(uint32_t[2], uint32_t[4], uint32_t, uint32_t);
+    Game(uint32_t[2], uint32_t[4], uint32_t, uint32_t, uint32_t);
     void update();
 
 private:
@@ -40,6 +42,7 @@ private:
     Button* buttons[4];
     Button* reset_button;
     Button* settings_button;
+    LEDStrip* led_strip;
     uint32_t end_time;
 
     void start_update();
