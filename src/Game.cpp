@@ -2,20 +2,9 @@
 // Created by Kodiko Dytis on 06/05/16.
 //
 
-#define MSECS_PER_SEC  (1000)
-#define MSECS_PER_MIN  (60UL * 1000)
-#define MSECS_PER_HOUR (3600UL * 1000)
-#define MSECS_PER_DAY  (SECS_PER_HOUR * 24L)
-
-/* Useful Macros for getting elapsed time */
-#define seconds(_time_) (_time_ % MSECS_PER_MIN)
-#define minutes(_time_) ((_time_ / MSECS_PER_MIN) % MSECS_PER_MIN)
-#define hours(_time_) (( _time_% MSECS_PER_DAY) / MSECS_PER_HOUR)
-
 #include "Game.h"
 
-Game::Game(uint32_t goal_pins[2], uint32_t pins[4], uint32_t reset_game_pin, uint32_t settings_pin, uint32_t mode_pin,
-           uint32_t led_pin) {
+Game::Game() {
     state = start_state;
 
     scores[TEAM_A] = 0;
@@ -25,22 +14,22 @@ Game::Game(uint32_t goal_pins[2], uint32_t pins[4], uint32_t reset_game_pin, uin
     max_scores[TEAM_A] = DEFAULT_MAX_SCORE;
 
 
-    goals[TEAM_A].set_pin(goal_pins[0]);
-    goals[TEAM_B].set_pin(goal_pins[1]);
+    goals[TEAM_A].set_pin(A_GOAL_PIN);
+    goals[TEAM_B].set_pin(B_GOAL_PIN);
 
-    buttons[TEAM_A][MINUS].set_pin(pins[0]);
-    buttons[TEAM_A][PLUS].set_pin(pins[1]);
-    buttons[TEAM_B][MINUS].set_pin(pins[2]);
-    buttons[TEAM_B][PLUS].set_pin(pins[3]);
+    buttons[TEAM_A][MINUS].set_pin(A_DEC_PIN);
+    buttons[TEAM_A][PLUS].set_pin(A_INC_PIN);
+    buttons[TEAM_B][MINUS].set_pin(A_DEC_PIN);
+    buttons[TEAM_B][PLUS].set_pin(A_INC_PIN);
 
-    reset_button    = new Button(reset_game_pin);
-    settings_button = new Button(settings_pin);
-    mode_button = new Button(mode_pin);
+    reset_button    = new Button(RESET_PIN);
+    settings_button = new Button(SETTINGS_PIN);
+    mode_button = new Button(MODE_PIN);
 
     timed_game = mode_button->is_pressed();
     duration = 600000; // 10 minutes;
 
-    led_strip = new LEDStrip(LED_COUNT, led_pin);
+    led_strip = new LEDStrip(LED_COUNT, LED_PIN);
     led_strip->fade(0xff0000, 0x0000ff, 255, 40);
 }
 

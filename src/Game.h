@@ -8,8 +8,10 @@
 #include <stdint.h>
 
 #include "Button.h"
-#include "GoalDetector.h"
+#include "config.h"
 #include "LEDStrip.h"
+#include "GoalDetector.h"
+#include "time.h"
 
 #define SCORE_LIMIT = 99
 #define TEAM_A 0
@@ -31,13 +33,13 @@ enum State {
 class Game {
 
 public:
-    Game(uint32_t[2], uint32_t[4], uint32_t, uint32_t, uint32_t, uint32_t);
+    Game();
     void update();
 
 private:
     State state;
-    int max_scores[2];
-    int scores[2];
+    uint16_t max_scores[2];
+    uint16_t scores[2];
     GoalDetector goals[2];
     Button* buttons[4];
     Button* reset_button;

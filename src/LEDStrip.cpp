@@ -118,7 +118,7 @@ void LEDStrip::scanner(uint32_t color, uint8_t interval, Direction direction) {
 }
 
 void LEDStrip::scanner_update() {
-    for (int i = 0; i < led_count; i++) {
+    for (unsigned int i = 0; i < led_count; i++) {
         if (i == index) { // Scan Pixel to the right
             strip->setPixelColor(i, color1);
         } else if (i == total_steps - index) { // Scan Pixel to the left
