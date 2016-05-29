@@ -37,6 +37,7 @@ Game::Game() {
 }
 
 void Game::update() {
+    led_strip->update();
     switch (state) {
         case start_state:
             start_update();
@@ -60,7 +61,7 @@ void Game::start_update() {
     } else if (reset_button->is_pressed()) {
         reset_scores();
         state = game_state;
-        led_strip->set_default();
+        led_strip->flood_light();
         start_time = millis();
     }
 }

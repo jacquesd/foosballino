@@ -35,7 +35,7 @@ public:
     LEDStrip(uint32_t, uint32_t);
     void goal_effect(byte team);
     void update();
-    void set_default();
+    void flood_light();
     void theater_chase(uint32_t, uint32_t, uint8_t, direction);
     void scanner(uint32_t, uint8_t, direction);
     void fade(uint32_t, uint32_t, uint16_t, uint8_t);

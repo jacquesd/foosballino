@@ -32,8 +32,8 @@ LEDStrip::LEDStrip(uint32_t LedCount, uint32_t DataPin) {
     strip->begin();
     strip->show();  // Initialize all pixels to 'off
 
-    set_default();
     LastUpdate = millis();
+    flood_light();
 }
 
 void LEDStrip::update() {
@@ -89,7 +89,7 @@ void LEDStrip::increment() {
     }
 }
 
-void LEDStrip::set_default() {
+void LEDStrip::flood_light() {
     Pattern = NONE;
     Interval = 50;
     for (uint32_t i=0; i < LedCount - 1; i=i+2) {
