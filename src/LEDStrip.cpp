@@ -20,29 +20,29 @@ uint8_t Blue(uint32_t color) {
 }
 
 
-LEDStrip::LEDStrip(uint32_t led_count, uint32_t data_pin) {
+LEDStrip::LEDStrip(uint32_t LedCount, uint32_t DataPin) {
     //   NEO_GRB     Pixels are wired for GRB bitstream, correct for neopixel stick
     //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip), correct for neopixel stick
 
-    this->led_count = led_count;
-    pinMode(data_pin, INPUT_PULLUP);
+    this->LedCount = LedCount;
+    // pinMode(DataPin, INPUT_PULLUP);
 
-    strip = new Adafruit_NeoPixel(this->led_count, data_pin, NEO_GRB + NEO_KHZ800);
+    strip = new Adafruit_NeoPixel(this->LedCount, DataPin, NEO_GRB + NEO_KHZ800);
 
     strip->begin();
     strip->show();  // Initialize all pixels to 'off
 
-    last_update = millis();
     set_default();
+    LastUpdate = millis();
 }
 
 void LEDStrip::update() {
-    if (millis() - last_update < interval) {
+    if (millis() - LastUpdate < Interval) {
         return;
     }
 
-    last_update = millis();
-    switch(pattern) {
+    LastUpdate = millis();
+    switch(Pattern) {
         case THEATER_CHASE:
             theater_chase_update();
             break;
@@ -58,28 +58,41 @@ void LEDStrip::update() {
 }
 
 void LEDStrip::increment() {
-    if (direction == FORWARD) {
-        index++;
-        if (index >= total_steps) {
-            index = 0;
-            if (pattern == SCANNER) {
-                this->set_default();
+    if (Direction == FORWARD) {
+        Index++;
+        if (Index >= TotalSteps) {
+            Index = 0;
+            switch (Pattern) {
+                case SCANNER:
+                    this->flood_light();
+                    break;
+                case FADE:
+                    fade(Color2, Color3, 200, 40);
+
+                    break;
             }
         }
-    } else {// direction == REVERSE
-        index--;
-        if (index <= 0) {
-            index = total_steps - 1;
-            if (pattern == SCANNER) {
-                this->set_default();
+    } else {// Direction == REVERSE
+        Index--;
+        if (Index <= 0) {
+            Index = TotalSteps - 1;
+            switch (Pattern) {
+                case SCANNER:
+                    this->flood_light();
+                    break;
+                case FADE:
+                    fade(Color2, Color3, 200, 40);
+
+                    break;
             }
         }
     }
 }
 
 void LEDStrip::set_default() {
-    pattern = NONE;
-    for (uint32_t i=0; i < led_count - 1; i=i+2) {
+    Pattern = NONE;
+    Interval = 50;
+    for (uint32_t i=0; i < LedCount - 1; i=i+2) {
         strip->setPixelColor(i, 160, 160, 160);
         strip->setPixelColor(i + 1, 0, 0, 0);
     }
@@ -87,69 +100,75 @@ void LEDStrip::set_default() {
 
 }
 
-void LEDStrip::theater_chase(uint32_t color1, uint32_t color2, uint8_t interval, Direction direction = FORWARD) {
-    pattern = THEATER_CHASE;
-    index = 0;
-    total_steps = led_count;
-    this->color1 = color1;
-    this->color2 = color2;
-    this->interval = interval;
-    this->direction = direction;
+void LEDStrip::theater_chase(uint32_t Color1, uint32_t Color2, uint8_t Interval, direction Direction = FORWARD) {
+    Pattern = THEATER_CHASE;
+    Index = 0;
+    TotalSteps = LedCount;
+    this->Color1 = Color1;
+    this->Color2 = Color2;
+    this->Interval = Interval;
+    this->Direction = Direction;
 }
 
 void LEDStrip::theater_chase_update() {
-    for(unsigned int i=0; i< led_count; i++) {
-        if ((i + index) % 3 == 0) {
-            strip->setPixelColor(i, color1);
+    for(unsigned int i=0; i< LedCount; i++) {
+        if ((i + Index) % 3 == 0) {
+            strip->setPixelColor(i, Color1);
         } else {
-            strip->setPixelColor(i, color2);
+            strip->setPixelColor(i, Color2);
         }
     }
     strip->show();
     increment();
 }
 
-void LEDStrip::scanner(uint32_t color, uint8_t interval, Direction direction) {
-    pattern = SCANNER;
-    index = 0;
-    total_steps = (led_count - 1) * 2;
-    this->interval = interval;
-    this->color1 = color;
+void LEDStrip::scanner(uint32_t color, uint8_t Interval, direction Direction) {
+    this->Interval = Interval;
+    this->Color1 = color;
+    this->Direction = Direction;
+    Pattern = SCANNER;
+    TotalSteps = (LedCount - 1) * 2;
+    Index = Direction == FORWARD ? 0 : TotalSteps;
+
 }
 
 void LEDStrip::scanner_update() {
-    for (unsigned int i = 0; i < led_count; i++) {
-        if (i == index) { // Scan Pixel to the right
-            strip->setPixelColor(i, color1);
-        } else if (i == total_steps - index) { // Scan Pixel to the left
-            strip->setPixelColor(i, color1);
+    unsigned int pos = 0;
+    for (unsigned int i = 0; i < LedCount; i++) {
+        pos = Direction == FORWARD ? i : (LedCount - 1 - i);
+        if (i == Index) { // Scan Pixel to the right
+                strip->setPixelColor(pos, Color1);
+        } else if (((signed) i) == TotalSteps - Index) { // Scan Pixel to the left
+                strip->setPixelColor(pos, Color1);
         } else { // Fading tail
-            strip->setPixelColor(i, dim_color(strip->getPixelColor(i)));
+                strip->setPixelColor(pos, dim_color(strip->getPixelColor(pos)));
         }
     }
     strip->show();
     increment();
 }
 
-void LEDStrip::fade(uint32_t color1, uint32_t color2, uint16_t steps, uint8_t interval) {
-    pattern = FADE;
-    index = 0;
-    total_steps = steps;
-    this->interval = interval;
-    this->color1 = color1;
-    this->color2 = color2;
+void LEDStrip::fade(uint32_t Color1, uint32_t Color2, uint16_t steps, uint8_t Interval) {
+    Pattern = FADE;
+    Index = 0;
+    TotalSteps = steps;
+    this->Interval = Interval;
+    this->Color1 = Color1;
+    this->Color3 = Color1;
+    this->Color2 = Color2;
+    this->Direction = FORWARD;
 }
 
 void LEDStrip::fade_update() {
-    // Calculate linear interpolation between color1 and color2
+    // Calculate linear interpolation between Color1 and Color2
     // Optimise order of operations to minimize truncation error
-    uint8_t red = ((Red(color1) * (total_steps - index)) + (Red(color2) * index)) / total_steps;
-    uint8_t green = ((Green(color1) * (total_steps - index)) + (Green(color2) * index)) / total_steps;
-    uint8_t blue = ((Blue(color1) * (total_steps - index)) + (Blue(color2) * index)) / total_steps;
-    color1 = strip->Color(red, green, blue);
+    uint8_t red = ((Red(Color1) * (TotalSteps - Index)) + (Red(Color2) * Index)) / TotalSteps;
+    uint8_t green = ((Green(Color1) * (TotalSteps - Index)) + (Green(Color2) * Index)) / TotalSteps;
+    uint8_t blue = ((Blue(Color1) * (TotalSteps - Index)) + (Blue(Color2) * Index)) / TotalSteps;
+    Color1 = strip->Color(red, green, blue);
 
-    for (unsigned  int i = 0; i < led_count; i++) {
-        strip->setPixelColor(i, color1);
+    for (unsigned  int i = 0; i < LedCount; i++) {
+        strip->setPixelColor(i, Color1);
     }
     strip->show();
     increment();
