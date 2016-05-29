@@ -7,6 +7,7 @@
 
 #include <SPI.h>
 #include <TFT_22_ILI9225.h>
+// #include <screen_4D_22_library.h>
 
 #include "time.h"
 #include "config.h"
@@ -16,16 +17,19 @@
 
 class Display {
 public:
-    Display();
-    void scores(uint16_t[2], uint32_t time);
-    void welcome();
-    void victory(uint8_t);
-    void draw();
-    void score_settings(uint16_t[2]);
-    void duration_settings(uint32_t);
+   Display();
+   void scores(uint16_t[2], uint32_t time);
+   void welcome();
+   void victory(uint8_t);
+   void draw();
+   void score_settings(uint16_t[2]);
+   void duration_settings(uint32_t);
+   void clear();
+   bool refresh();
 
 private:
-    TFT_22_ILI9225* tft;
+   TFT_22_ILI9225* tft;
+   uint32_t last_update;
 };
 
 
