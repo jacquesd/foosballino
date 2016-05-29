@@ -30,7 +30,8 @@ Game::Game() {
     duration = 600000; // 10 minutes;
 
     led_strip = new LEDStrip(LED_COUNT, LED_PIN);
-    led_strip->fade(0xff0000, 0x0000ff, 255, 40);
+
+    led_strip->fade(TEAM_B_ALT_COLOR, TEAM_A_COLOR, 200, 40);
 
     display = new Display();
     display->welcome();
@@ -128,20 +129,24 @@ void Game::game_update() {
         state = end_state;
         end_time = millis();
         if (scores[TEAM_A] > scores[TEAM_B]) {
-            led_strip->theater_chase(0xff0000, 0x00ff00, 40, FORWARD);
+            led_strip->theater_chase(TEAM_A_ALT_COLOR, TEAM_A_COLOR, 200, FORWARD);
+
         }  else if (scores[TEAM_A] < scores[TEAM_B]) {
-            led_strip->theater_chase(0x0000ff, 0x00ff00, 40, REVERSE);
+            led_strip->theater_chase(TEAM_B_ALT_COLOR, TEAM_B_COLOR, 200, REVERSE);
+
         } else {
-            led_strip->theater_chase(0x00ff00, 0xff00ff, 40, REVERSE);
+            led_strip->theater_chase(TEAM_A_ALT_COLOR, TEAM_B_ALT_COLOR, 200, REVERSE);
         }
     } else if (scores[TEAM_A] >= max_scores[TEAM_A]) {
         state = end_state;
         end_time = millis();
-        led_strip->theater_chase(0xff0000, 0x00ff00, 40, FORWARD);
+        led_strip->theater_chase(TEAM_A_ALT_COLOR, TEAM_A_COLOR, 200, FORWARD);
+
     } else if (scores[TEAM_B] >= max_scores[TEAM_B]) {
         state = end_state;
         end_time = millis();
-        led_strip->theater_chase(0x0000ff, 0x00ff00, 40, REVERSE);
+        led_strip->theater_chase(TEAM_B_COLOR, TEAM_B_ALT_COLOR, 200, REVERSE);
+        led_strip->fade(TEAM_B_COLOR, TEAM_A_COLOR, 200, 40);
     }
 }
 
@@ -171,7 +176,7 @@ void Game::end_update() {
 
     } else if (millis() - end_time > END_TIMEOUT) {
         state = start_state;
-        led_strip->fade(0xff0000, 0x0000ff, 255, 40);
+        led_strip->fade(TEAM_B_COLOR, TEAM_A_COLOR, 200, 40);
     }
 }
 
@@ -192,9 +197,9 @@ void Game::update_score(byte team) {
     if (goals[team].isGoal() || buttons[team][PLUS].is_pressed()) {
         scores[team]++;
         if (team == TEAM_A) {
-            led_strip->scanner(0xff0000, 20, FORWARD);
+            led_strip->scanner(TEAM_A_COLOR, 20, FORWARD);
         } else {
-            led_strip->scanner(0x0000ff, 20, REVERSE);
+            led_strip->scanner(TEAM_B_COLOR, 20, REVERSE);
         }
 
     }

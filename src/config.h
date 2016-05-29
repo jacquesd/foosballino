@@ -8,6 +8,10 @@
 // TEAMS (do not change)
 #define TEAM_A 0
 #define TEAM_B 1
+#define TEAM_A_COLOR 0xffff00
+#define TEAM_A_ALT_COLOR 0x00ff00
+#define TEAM_B_COLOR 0xff00ff
+#define TEAM_B_ALT_COLOR 0x0000ff
 
 // Goal detector pins
 #define A_GOAL_PIN 1
