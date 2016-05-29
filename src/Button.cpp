@@ -6,14 +6,31 @@
 
 Button::Button() {
     this->pin = 0;
+    pressed = false;
 }
 
 Button::Button(uint32_t pin) {
     this->set_pin(pin);
+    pressed = false;
 }
 
 bool Button::is_pressed() {
-    return digitalRead(pin) == HIGH;
+    uint32_t now = millis();
+    if (now - last_read < BUTTON_INTERVAL) {
+        return false;
+    }
+    last_read = now;
+    if (pressed) {
+        if (digitalRead(pin) == LOW) {
+            pressed = false;
+        }
+        return false;
+    } else {
+        if (digitalRead(pin) == HIGH) {
+            pressed = true;
+        }
+        return pressed;
+    }
 }
 
 void Button::set_pin(uint32_t pin) {

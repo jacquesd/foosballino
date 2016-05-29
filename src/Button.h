@@ -5,7 +5,14 @@
 #ifndef FOOSBALLINO_BUTTON_H
 #define FOOSBALLINO_BUTTON_H
 
+#if (ARDUINO >= 100)
 #include <Arduino.h>
+#else
+#include <WProgram.h>
+  #include <pins_arduino.h>
+#endif
+
+#define BUTTON_INTERVAL 100
 
 class Button {
 
@@ -17,6 +24,8 @@ public:
 
 private:
     uint32_t pin;
+    uint32_t last_read;
+    bool pressed;
 };
 
 
