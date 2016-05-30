@@ -6,16 +6,17 @@
 
 Game::Game() {
     state = start_state;
+    Serial.print("START\n");
 
     scores[TEAM_A] = 0;
     scores[TEAM_B] = 0;
 
     max_scores[TEAM_A] = DEFAULT_MAX_SCORE;
-    max_scores[TEAM_A] = DEFAULT_MAX_SCORE;
+    max_scores[TEAM_B] = DEFAULT_MAX_SCORE;
 
 
-    goals[TEAM_A].set_pin(A_GOAL_PIN);
-    goals[TEAM_B].set_pin(B_GOAL_PIN);
+    // goals[TEAM_A].set_pin(A_GOAL_PIN);
+    // goals[TEAM_B].set_pin(B_GOAL_PIN);
 
     dec_buttons[TEAM_A].set_pin(A_DEC_PIN);
     inc_buttons[TEAM_A].set_pin(A_INC_PIN);
@@ -24,7 +25,7 @@ Game::Game() {
 
     reset_button    = new Button(RESET_PIN);
     settings_button = new Button(SETTINGS_PIN);
-    mode_button = new Button(MODE_PIN);
+    mode_button     = new Button(MODE_PIN);
 
     timed_game = mode_button->is_pressed();
     duration = 600000; // 10 minutes;
@@ -59,9 +60,14 @@ void Game::start_update() {
     timed_game = mode_button->is_pressed();
     if (settings_button->is_pressed()) {
         state = settings_state;
+        display->clear();
+        Serial.print("SETTINGS\n");
+
     } else if (reset_button->is_pressed()) {
         reset_scores();
         state = game_state;
+        Serial.print("GAME\n");
+        display->clear();
         led_strip->flood_light();
         start_time = millis();
     }
@@ -71,29 +77,29 @@ void Game::settings_update() {
     timed_game = mode_button->is_pressed();
 
     if (timed_game) {
-        display->duration_settings(duration);
+        display->duration_settings(duration / 1000);
         if (dec_buttons[TEAM_A].is_pressed()) {
             duration = (minutes(duration) <= 0)
-                       ? (59 * MSECS_PER_MIN  + seconds(duration))
-                       : (duration - MSECS_PER_MIN);
+                       ? (59 * SECS_PER_MIN  + seconds(duration))
+                       : (duration - SECS_PER_MIN);
         }
 
         if (inc_buttons[TEAM_A].is_pressed()) {
             duration = (minutes(duration) >= 59)
                        ? seconds(duration)
-                       : (duration + MSECS_PER_MIN);
+                       : (duration + SECS_PER_MIN);
         }
 
         if (dec_buttons[TEAM_B].is_pressed()) {
             duration = (seconds(duration) <= 0)
-                       ? (minutes(duration) + 59 * MSECS_PER_SEC)
-                       : (duration - MSECS_PER_SEC);
+                       ? (minutes(duration) + 59)
+                       : (duration);
         }
 
         if (inc_buttons[TEAM_B].is_pressed()) {
             duration = (seconds(duration) >= 59)
                        ? minutes(duration)
-                       : (duration + MSECS_PER_SEC);
+                       : (duration);
         }
     } else {
         display->score_settings(max_scores);
@@ -116,6 +122,9 @@ void Game::settings_update() {
 
     if (settings_button->is_pressed()) {
         state = start_state;
+        display->clear();
+        display->welcome();
+        Serial.print("START\n");
     }
 }
 
@@ -123,30 +132,51 @@ void Game::game_update() {
 
     update_score(TEAM_A);
     update_score(TEAM_B);
-    display->scores(scores, duration);
+    if (display->refresh()) {
+        display->scores(scores, duration / 1000);
+    }
+
 
     if (timed_game && millis() - start_time > duration) {
         state = end_state;
+        Serial.print("END\n");
+        display->clear();
         end_time = millis();
+
         if (scores[TEAM_A] > scores[TEAM_B]) {
             led_strip->theater_chase(TEAM_A_ALT_COLOR, TEAM_A_COLOR, 200, FORWARD);
+            display->victory(TEAM_A);
 
         }  else if (scores[TEAM_A] < scores[TEAM_B]) {
             led_strip->theater_chase(TEAM_B_ALT_COLOR, TEAM_B_COLOR, 200, REVERSE);
+            display->victory(TEAM_B);
 
         } else {
             led_strip->theater_chase(TEAM_A_ALT_COLOR, TEAM_B_ALT_COLOR, 200, REVERSE);
         }
+
     } else if (scores[TEAM_A] >= max_scores[TEAM_A]) {
         state = end_state;
+        Serial.print("END\n");
+        display->clear();
         end_time = millis();
         led_strip->theater_chase(TEAM_A_ALT_COLOR, TEAM_A_COLOR, 200, FORWARD);
+        display->victory(TEAM_A);
 
     } else if (scores[TEAM_B] >= max_scores[TEAM_B]) {
         state = end_state;
+        Serial.print("END\n");
         end_time = millis();
         led_strip->theater_chase(TEAM_B_COLOR, TEAM_B_ALT_COLOR, 200, REVERSE);
+        display->clear();
+        display->victory(TEAM_B);
+
+    } else if (reset_button->is_pressed()) {
+        state = start_state;
+        Serial.print("START\n");
         led_strip->fade(TEAM_B_COLOR, TEAM_A_COLOR, 200, 40);
+        display->clear();
+        display->draw();
     }
 }
 
@@ -154,27 +184,33 @@ void Game::end_update() {
     if (dec_buttons[TEAM_A].is_pressed()) {
         scores[TEAM_A]--;
         state = game_state;
-        led_strip->set_default();
+        Serial.print("GAME\n");
+        led_strip->flood_light();
 
     } else if (dec_buttons[TEAM_B].is_pressed()) {
         scores[TEAM_B]--;
         state = game_state;
-        led_strip->set_default();
+        Serial.print("GAME\n");
+        led_strip->flood_light();
 
     } else if (reset_button->is_pressed()) {
         reset_scores();
         state = game_state;
-        led_strip->set_default();
+        Serial.print("GAME\n");
+        led_strip->flood_light();
         start_time = millis();
 
     } else if (millis() - end_time > END_TIMEOUT) {
         state = start_state;
+        Serial.print("START\n");
         led_strip->fade(TEAM_B_COLOR, TEAM_A_COLOR, 200, 40);
+        display->clear();
+        display->welcome();
     }
 }
 
 void Game::reset_scores() {
-    scores[TEAM_A]= 0;
+    scores[TEAM_A] = 0;
     scores[TEAM_B] = 0;
 }
 

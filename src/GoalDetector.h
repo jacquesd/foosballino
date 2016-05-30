@@ -5,7 +5,12 @@
 #ifndef FOOSBALLINO_GOALDETECTOR_H
 #define FOOSBALLINO_GOALDETECTOR_H
 
-#include <Arduino.h>
+#if (ARDUINO >= 100)
+  #include <Arduino.h>
+#else
+#include <WProgram.h>
+  #include <pins_arduino.h>
+#endif
 
 #define min_distance 5
 #define bounce_interval 2000

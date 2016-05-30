@@ -11,16 +11,12 @@
 #include "config.h"
 #include "LEDStrip.h"
 #include "Display.h"
-#include "GoalDetector.h"
+// #include "GoalDetector.h"
 #include "time.h"
 
 #define SCORE_LIMIT = 99
-#define TEAM_A 0
-#define TEAM_B 1
-#define MINUS 0
-#define PLUS 1
-#define DEFAULT_MAX_SCORE 10
-#define END_TIMEOUT 5000 // ms
+#define DEFAULT_MAX_SCORE 2
+#define END_TIMEOUT 10000 // ms
 #define LED_COUNT 70 //leds per strip
 
 
@@ -36,13 +32,14 @@ class Game {
 public:
     Game();
     void update();
+    State state;
 
 private:
-    State state;
     uint16_t max_scores[2];
     uint16_t scores[2];
-    GoalDetector goals[2];
-    Button* buttons[4];
+    // GoalDetector goals[2];
+    Button inc_buttons[2];
+    Button dec_buttons[2];
     Button* reset_button;
     Button* settings_button;
     Button* mode_button;
