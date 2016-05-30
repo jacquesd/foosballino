@@ -17,10 +17,10 @@ Game::Game() {
     goals[TEAM_A].set_pin(A_GOAL_PIN);
     goals[TEAM_B].set_pin(B_GOAL_PIN);
 
-    buttons[TEAM_A][MINUS].set_pin(A_DEC_PIN);
-    buttons[TEAM_A][PLUS].set_pin(A_INC_PIN);
-    buttons[TEAM_B][MINUS].set_pin(A_DEC_PIN);
-    buttons[TEAM_B][PLUS].set_pin(A_INC_PIN);
+    dec_buttons[TEAM_A].set_pin(A_DEC_PIN);
+    inc_buttons[TEAM_A].set_pin(A_INC_PIN);
+    dec_buttons[TEAM_B].set_pin(B_DEC_PIN);
+    inc_buttons[TEAM_B].set_pin(B_INC_PIN);
 
     reset_button    = new Button(RESET_PIN);
     settings_button = new Button(SETTINGS_PIN);
@@ -72,48 +72,47 @@ void Game::settings_update() {
 
     if (timed_game) {
         display->duration_settings(duration);
-        if (buttons[TEAM_A][MINUS].is_pressed()) {
+        if (dec_buttons[TEAM_A].is_pressed()) {
             duration = (minutes(duration) <= 0)
                        ? (59 * MSECS_PER_MIN  + seconds(duration))
                        : (duration - MSECS_PER_MIN);
         }
 
-        if (buttons[TEAM_A][PLUS].is_pressed()) {
+        if (inc_buttons[TEAM_A].is_pressed()) {
             duration = (minutes(duration) >= 59)
                        ? seconds(duration)
                        : (duration + MSECS_PER_MIN);
         }
 
-        if (buttons[TEAM_B][MINUS].is_pressed()) {
+        if (dec_buttons[TEAM_B].is_pressed()) {
             duration = (seconds(duration) <= 0)
                        ? (minutes(duration) + 59 * MSECS_PER_SEC)
                        : (duration - MSECS_PER_SEC);
         }
 
-        if (buttons[TEAM_B][PLUS].is_pressed()) {
+        if (inc_buttons[TEAM_B].is_pressed()) {
             duration = (seconds(duration) >= 59)
                        ? minutes(duration)
                        : (duration + MSECS_PER_SEC);
         }
     } else {
         display->score_settings(max_scores);
-        if (buttons[TEAM_A][MINUS].is_pressed()) {
-            max_scores[TEAM_A] = (max_scores[TEAM_A] - 1 <= 1) ? 99 : (max_scores[TEAM_A] - 1);
+        if (dec_buttons[TEAM_A].is_pressed()) {
+            max_scores[TEAM_A] = (max_scores[TEAM_A] < 1) ? 99 : (max_scores[TEAM_A] - 1);
         }
 
-        if (buttons[TEAM_A][PLUS].is_pressed()) {
-            max_scores[TEAM_A] = (max_scores[TEAM_A] + 1 >= 99) ? 1 : (max_scores[TEAM_A] + 1);
+        if (inc_buttons[TEAM_A].is_pressed()) {
+            max_scores[TEAM_A] = (max_scores[TEAM_A] >= 99) ? 1 : (max_scores[TEAM_A] + 1);
         }
 
-        if (buttons[TEAM_B][MINUS].is_pressed()) {
-            max_scores[TEAM_B] = (max_scores[TEAM_B] - 1 <= 1) ? 99 : (max_scores[TEAM_B] - 1);
+        if (dec_buttons[TEAM_B].is_pressed()) {
+            max_scores[TEAM_B] = (max_scores[TEAM_B] < 1) ? 99 : (max_scores[TEAM_B] - 1);
         }
 
-        if (buttons[TEAM_B][PLUS].is_pressed()) {
-            max_scores[TEAM_B] = (max_scores[TEAM_B] + 1 <= 99) ? 1 : (max_scores[TEAM_B] + 1);
+        if (inc_buttons[TEAM_B].is_pressed()) {
+            max_scores[TEAM_B] = (max_scores[TEAM_B] >= 99) ? 1 : (max_scores[TEAM_B] + 1);
         }
     }
-
 
     if (settings_button->is_pressed()) {
         state = start_state;
@@ -121,6 +120,7 @@ void Game::settings_update() {
 }
 
 void Game::game_update() {
+
     update_score(TEAM_A);
     update_score(TEAM_B);
     display->scores(scores, duration);
@@ -151,19 +151,12 @@ void Game::game_update() {
 }
 
 void Game::end_update() {
-    if (scores[TEAM_A] > scores[TEAM_B]) {
-        display->victory(TEAM_A);
-    }  else if (scores[TEAM_A] < scores[TEAM_B]) {
-        display->victory(TEAM_B);
-    } else {
-        display->draw();
-    }
-    if (buttons[TEAM_A][MINUS].is_pressed()) {
+    if (dec_buttons[TEAM_A].is_pressed()) {
         scores[TEAM_A]--;
         state = game_state;
         led_strip->set_default();
 
-    } else if (buttons[TEAM_B][MINUS].is_pressed()) {
+    } else if (dec_buttons[TEAM_B].is_pressed()) {
         scores[TEAM_B]--;
         state = game_state;
         led_strip->set_default();
@@ -190,11 +183,16 @@ void Game::update_score(byte team) {
         return;
     }
 
-    if (scores[team] > 0 && buttons[team][MINUS].is_pressed()) {
+    if (scores[team] > 0 && dec_buttons[team].is_pressed()) {
         scores[team]--;
+        if (team == TEAM_A) {
+            Serial.print("Minus A\n");
+        } else {
+            Serial.print("Minus B\n");
+        }
     }
 
-    if (goals[team].isGoal() || buttons[team][PLUS].is_pressed()) {
+    if (/*goals[team]->isGoal() ||*/ inc_buttons[team].is_pressed()) {
         scores[team]++;
         if (team == TEAM_A) {
             led_strip->scanner(TEAM_A_COLOR, 20, FORWARD);
