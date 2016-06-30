@@ -1,25 +1,27 @@
-#include <Arduino.h>
+/**
+    Main file of the foosballino project.
+
+    For configuration,  see `/src/config.h`.
+*/
+
+#if (ARDUINO >= 100)
+  #include <Arduino.h>
+#else
+  #include <WProgram.h>
+  #include <pins_arduino.h>
+#endif
 #include "Game.h"
 
-Game* game;
-
-// #include "time.h"
-//
-// int start;
-// int dur;
+Game* game;  // main game object
 
 void setup() {
+    DEBUG_PRINT("Foosballino setup...\n");
+    // Initialize Serial for the display's SPI and debug prints
     Serial.begin(9600);
-    Serial.print("Game create\n");
-    game = new Game(2);
-    Serial.print("Game created\n");
-    // start = millis();
+    game = new Game();
+    DEBUG_PRINT("Ready\n");
 }
 
 void loop() {
    game->update();
-   // dur  = (millis() - start) / 1000;
-   // Serial.write(27);
-   // Serial.print(String(minutes(dur)) + ":" + String(seconds(dur)) + "\n");
-   // delay(500);
 }

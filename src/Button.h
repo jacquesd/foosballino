@@ -1,18 +1,12 @@
-//
-// Created by Kodiko Dytis on 12/05/16.
-//
-
 #ifndef FOOSBALLINO_BUTTON_H
 #define FOOSBALLINO_BUTTON_H
 
 #if (ARDUINO >= 100)
-#include <Arduino.h>
+  #include <Arduino.h>
 #else
-#include <WProgram.h>
+  #include <WProgram.h>
   #include <pins_arduino.h>
 #endif
-
-#define BUTTON_INTERVAL 100
 
 class Button {
 
@@ -23,10 +17,8 @@ public:
     void set_pin(uint32_t);
 
 private:
-    uint32_t pin;
-    uint32_t last_read;
-    bool pressed;
+    uint32_t pin; // The pin from which to read the button's signal.
+    bool pressed; // Internal state to keep track of whether the btn is pressed.
 };
-
 
 #endif //FOOSBALLINO_BUTTON_H

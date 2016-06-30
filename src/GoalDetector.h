@@ -1,32 +1,27 @@
-//
-// Created by Sammy Rosso on 14/05/16.
-//
-
 #ifndef FOOSBALLINO_GOALDETECTOR_H
 #define FOOSBALLINO_GOALDETECTOR_H
 
 #if (ARDUINO >= 100)
   #include <Arduino.h>
 #else
-#include <WProgram.h>
+  #include <WProgram.h>
   #include <pins_arduino.h>
 #endif
 
-#define min_distance 5
-#define bounce_interval 2000
+#include "config.h"
 
 class GoalDetector {
 
 public:
     GoalDetector();
     GoalDetector(uint32_t);
-    bool isGoal();
+    bool is_goal();
     void set_pin(uint32_t);
 
 private:
-    uint32_t pin;
-    uint32_t prev_goal_time;
-    uint32_t prev_goal_value;
+    uint32_t pin;            // Pin for the sensor used by the detector
+    uint32_t prev_goal_time; // Time of the last detected goal
+
     void init();
 };
 
