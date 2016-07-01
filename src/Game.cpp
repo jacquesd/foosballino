@@ -196,12 +196,14 @@ inline void Game::update_max_score(int team) {
             ? 99
             : (max_scores[team] - 1);
         dirty = true;
+        DEBUG_PRINT("Decrement max score\n");
     }
     if (inc_buttons[team].is_pressed()) {
         max_scores[team] = (max_scores[team] >= 99)
             ? 1
             : (max_scores[team] + 1);
         dirty = true;
+        DEBUG_PRINT("Increment max score\n");
     }
 
     if (dirty) {
@@ -243,6 +245,7 @@ bool Game::wins(int team) {
 inline bool Game::cancel_goal(int team) {
     if (scores[team] >= max_scores[team] && dec_buttons[team].is_pressed()) {
         scores[team] = max_scores[team] - 1;
+        DEBUG_PRINT("Cancel goal\n");
         return true;
     }
     return false;
@@ -258,6 +261,7 @@ inline bool Game::reset_game() {
     if (reset_button->is_pressed()) {
         scores[TEAM_A] = 0;
         scores[TEAM_B] = 0;
+        DEBUG_PRINT("Game reset\n");
         return true;
     }
     return false;
@@ -278,11 +282,13 @@ void Game::update_score(int team) {
     if (scores[team] > 0 && dec_buttons[team].is_pressed()) {
         scores[team]--;
         display->update_score(scores[team], team);
+        DEBUG_PRINT("Decrease score\n");
     }
 
     if (goals[team].is_goal() || inc_buttons[team].is_pressed()) {
         scores[team]++;
         display->update_score(scores[team], team);
         led_strip->goal_effect(team);
+        DEBUG_PRINT("Increase score\n");
     }
 }

@@ -59,6 +59,8 @@
 #define TFT_CS  10  // SS
 #define TFT_LED 7   // 0 if wired to +5V directly (= disabled)
 
+// Debug mode
+//#define DEBUG 1 // uncomment to print debug info over serial
 
 // Do not modify below this line
 //------------------------------------------------------------------------------
